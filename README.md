@@ -1,8 +1,8 @@
 # Decoratex
 
-[![Hex.pm](https://img.shields.io/hexpm/dt/trans.svg?maxAge=2592000&style=flat-square)](https://hex.pm/packages/trans)
+[![Hex.pm](https://img.shields.io/hexpm/dt/decoratex.svg?maxAge=2592000&style=flat-square)](https://hex.pm/packages/decoratex)
 
-Decoratex allow you to decorate your struct models by adding virtual attributes and load data when you need, keeping the model structure.
+Decoratex allow you to decorate your struct models by adding virtual attributes and populate them with data when you need, keeping the model structure.
 
 ## Requirements
 
@@ -10,9 +10,9 @@ Decoratex allow you to decorate your struct models by adding virtual attributes 
 
 ## What does this package do?
 
-  Maybe you was in some situations where you need some related data of a model that is not straight stored with it's attributes and it requires a complex logic to calculate that can't be easly solved with a query. Maybe you will need this data in multiple points of the instace life cicle and you want the data available in a standar way instead of use an external module function each time you need the value.
+  Maybe you were in some situations where you need some related data of a model that is not straight stored with it's attributes and it requires complex logic to calculate their value, which can't be easly solved with a query. Maybe you will need this data in multiple points of the instace life cicle and you want the data available in a standard way instead of using an external module function each time you need it's value.
 
-  In this cases, this is waht decoratex can do for you:
+  In this cases, this is what decoratex can do for you:
 
   * Add virtual fields to the model schema to let you use your model like the same struct type with these new fields.
 
@@ -20,15 +20,13 @@ Decoratex allow you to decorate your struct models by adding virtual attributes 
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+The package can be installed as simply as adding `decoratex` to your list of dependencies in `mix.exs`:
 
-  Add `decoratex` to your list of dependencies in `mix.exs`:
-
-    ```elixir
-    def deps do
-      [{:decoratex, "~> 0.1.0"}]
-    end
-    ```
+```elixir
+  def deps do
+    [{:decoratex, "~> 0.1.0"}]
+  end
+```
 
 ## Usage
 
@@ -56,9 +54,9 @@ defmodule Post do
 end
 ```
 
-The decorations definition needs to be placed before schema definition, and then, you should add `add_decortios` inside the schema block. This will add the virtual fields to your model.
+The decorations definition needs to be placed before schema definition, and then, you should add `add_decorations` inside the schema block: this will automatically add the virtual fields to your model.
 
-Finally, you can use the new `decorate` funciton of your model module to load the the fields that you want calculate with the function associated to the field.
+Finally, you can use the `decorate` funciton of your model module to populate the fields that you need with the function associated to them.
 
 ```elixir
 post = Post
