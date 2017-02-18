@@ -10,7 +10,7 @@ Decoratex allow you to decorate your struct models by adding virtual attributes 
 
 ## What does this package do?
 
-  Maybe you was in some situations where you need some related data of model that is not straight stored with it's attributes and it requires a complex logic to calculate that can't be easly solved with a query. Maybe you will need this data in multiple points of the instace life cicle and you want the data available in a standar way instead of use an external module function each time you need the value.
+  Maybe you was in some situations where you need some related data of a model that is not straight stored with it's attributes and it requires a complex logic to calculate that can't be easly solved with a query. Maybe you will need this data in multiple points of the instace life cicle and you want the data available in a standar way instead of use an external module function each time you need the value.
 
   In this cases, this is waht decoratex can do for you:
 
