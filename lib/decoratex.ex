@@ -75,6 +75,8 @@ defmodule Decoratex do
   And use ´post.happy_comments_count´ wherever you want as regular post attrbute
   in another methods, when decoding as JSON...
 
+  **NOTE:** the fields decoration needs to be defined before de schema
+
   """
 
   defmacro __using__(_opts) do
