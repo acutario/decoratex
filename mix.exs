@@ -7,7 +7,8 @@ defmodule Decoratex.Mixfile do
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps()]
+     deps: deps(),
+     elixirc_paths: elixirc_paths(Mix.env)]
   end
 
   # Configuration for the OTP application
@@ -32,4 +33,10 @@ defmodule Decoratex.Mixfile do
      {:earmark, "~> 0.1", only: :dev},
      {:dialyxir, "~> 0.3", only: :dev}]
   end
+
+  # Always compile files in "lib". In tests compile also files in
+  # "test/support"
+  def elixirc_paths(:test), do: elixirc_paths ++ ["test/support"]
+  def elixirc_paths(_), do: elixirc_paths
+  def elixirc_paths, do: ["lib"]
 end
