@@ -1,7 +1,7 @@
 defmodule Decoratex do
   @moduledoc """
   Decoratex allow you to decorate your struct models by adding virtual
-  attributes and load calculated data when you need.
+  attributes and load data when you need, keeping the model structure.
 
   You have to define the name and type of these attributes and the function
   for calculate and load data when you need to decorate your model.
@@ -93,11 +93,16 @@ defmodule Decoratex do
       This functions just call the configured function to each field passing
       the model structure it self and it store the result in the virtual field.
       """
+      @spec decorate(struct()) :: struct()
       def decorate(element) do
         element.__struct__.__decorations__
         |> Enum.reduce(element, &do_decorate/2)
       end
+
+      @spec decorate(struct(), atom()) :: struct()
       def decorate(element, name) when is_atom(name), do: decorate(element, [name])
+
+      @spec decorate(struct(), list(atom())) :: struct()
       def decorate(element, names) when is_list(names) do
         element.__struct__.__decorations__
         |> Stream.filter(fn(%{name: name}) -> Enum.member?(names, name) end)
