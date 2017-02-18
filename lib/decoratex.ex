@@ -1,6 +1,6 @@
 defmodule Decoratex do
   @moduledoc """
-  Decoratex allow you to decorate your struct models by adding virtual
+  Decoratex allows you to decorate your struct models by adding virtual
   attributes and load data when you need, keeping the model structure.
 
   You have to define the name and type of these attributes and the function
@@ -10,14 +10,14 @@ defmodule Decoratex do
 
   ## What does this package do?
 
-  Maybe you was in some situations where you need some related data of model
-  that is not straight stored with it's attributes and it requires a complex
-  logic to calculate that can't be easly solved with a query. Maybe you will
-  need this data in multiple points of the instace life cicle and you want
-  the data available in a standar way instead of use an external module function
-  each time you need the value.
+  Maybe you were in some situations where you need some related data of a model
+  that is not straight stored with it's attributes and it requires complex logic
+  to calculate their value, which can't be easly solved with a query. Maybe you
+  will need this data in multiple points of the instace life cicle and you want
+  the data available in a standard way instead of using an external module
+  function each time you need it's value.
 
-  In this cases, this is waht decoratex can do for you:
+  In this cases, this is what decoratex can do for you:
 
   * Add virtual fields to the model schema to let you use your model like
   the same struct type with these new fields.

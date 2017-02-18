@@ -2,7 +2,7 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/dt/decoratex.svg?maxAge=2592000&style=flat-square)](https://hex.pm/packages/decoratex)
 
-Decoratex allow you to decorate your struct models by adding virtual attributes and populate them with data when you need, keeping the model structure.
+Decoratex allows you to decorate your struct models by adding virtual attributes and populate them with data when you need, keeping the model structure.
 
 ## Requirements
 
