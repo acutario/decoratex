@@ -1,14 +1,20 @@
 defmodule Decoratex.Mixfile do
   use Mix.Project
 
+  @version "0.1.0"
+
   def project do
     [app: :decoratex,
-     version: "0.1.0",
+     version: @version,
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps(),
-     elixirc_paths: elixirc_paths(Mix.env)]
+     elixirc_paths: elixirc_paths(Mix.env),
+     # Docs
+     name: "Decoratex",
+     description: description,
+     package: package]
   end
 
   # Configuration for the OTP application
@@ -31,7 +37,8 @@ defmodule Decoratex.Mixfile do
     [{:ecto, "~> 2.0"},
      {:ex_doc, "~> 0.11", only: :dev},
      {:earmark, "~> 0.1", only: :dev},
-     {:dialyxir, "~> 0.3", only: :dev}]
+     {:dialyxir, "~> 0.3", only: :dev},
+     {:credo, "~> 0.4", only: :dev}]
   end
 
   # Always compile files in "lib". In tests compile also files in
@@ -39,4 +46,20 @@ defmodule Decoratex.Mixfile do
   def elixirc_paths(:test), do: elixirc_paths ++ ["test/support"]
   def elixirc_paths(_), do: elixirc_paths
   def elixirc_paths, do: ["lib"]
+
+  defp description do
+    """
+    Decoratex allow you to decorate your struct models by adding virtual
+    attributes and load data when you need, keeping the model structure.
+    """
+  end
+
+  defp package do
+    [
+    files: ["lib", "mix.exs", "README.md"],
+    maintainers: ["Rubén Sierra González"],
+    licenses: ["MIT"],
+    links: %{"GitHub" => "https://github.com/acutario/decoratex"}
+    ]
+  end
 end
