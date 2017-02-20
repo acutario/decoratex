@@ -30,7 +30,7 @@ The package can be installed as simply as adding `decoratex` to your list of dep
 
 ## Usage
 
-First of all, add `use Decoratex` to your models. Then you can set de decorate fields with `decorations` and `decorate_field` functions:
+First of all, add `use Decoratex` to your models. Then you can set the decorate fields with `decorations` and `decorate_field` functions:
 
 ```elixir
 defmodule Post do
@@ -73,4 +73,5 @@ post = Post
 |> Post.decorate([:happy_comments_count, ...])
 
 post.happy_comments_count
+234
 ```
