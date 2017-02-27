@@ -2,7 +2,7 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/dt/decoratex.svg?maxAge=2592000&style=flat-square)](https://hex.pm/packages/decoratex)
 
-This package allows to add calculated data to your Ecto model structs in an easy way.
+Decoratex provides an easy way to add calculated data to your Ecto model structs.
 
 ## Requirements
 

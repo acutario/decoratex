@@ -1,7 +1,6 @@
 defmodule Decoratex do
   @moduledoc """
-  This module allows to add calculated data to your Ecto model structs in an
-  easy way.
+  Decoratex provides an easy way to add calculated data to your Ecto model structs.
 
   You have to configure the name and type of these attributes and the function
   to calculate and load data when you need to decorate your model.
