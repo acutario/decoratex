@@ -1,10 +1,10 @@
 defmodule Decoratex do
   @moduledoc """
-  Decoratex allows you to decorate your struct models by adding virtual
-  attributes and load data when you need, keeping the model structure.
+  This module allows to add calculated data to your Ecto model structs in an
+  easy way.
 
-  You have to define the name and type of these attributes and the function
-  for calculate and load data when you need to decorate your model.
+  You have to configure the name and type of these attributes and the function
+  to calculate and load data when you need to decorate your model.
 
   The function for each field will receibe just the current model instance as param.
 

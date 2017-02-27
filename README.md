@@ -2,7 +2,7 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/dt/decoratex.svg?maxAge=2592000&style=flat-square)](https://hex.pm/packages/decoratex)
 
-Decoratex allows you to decorate your struct models by adding virtual attributes and populate them with data when you need, keeping the model structure.
+This package allows to add calculated data to your Ecto model structs in an easy way.
 
 ## Requirements
 
@@ -10,11 +10,11 @@ Decoratex allows you to decorate your struct models by adding virtual attributes
 
 ## What does this package do?
 
-  Maybe you were in some situations where you need some related data of a model that is not straight stored with it's attributes and it requires complex logic to calculate their value, which can't be easly solved with a query. Maybe you will need this data in multiple points of the instace life cicle and you want the data available in a standard way instead of using an external module function each time you need it's value.
+  Maybe you have been in some situations where you need some related data of a model that is not straight stored with it's attributes and it requires a complex logic to calculate their value that can't be solved with a query. Maybe you will need this data in multiple points of the instace life cicle and you want the data available in a standard way instead of using an external module function each time you need it's value.
 
   In this cases, this is what decoratex can do for you:
 
-  * Add virtual fields to the model schema to let you use your model like the same struct type with these new fields.
+  * Add virtual fields to the model schema to let you use your model like the same model struct with these new fields.
 
   * Provide a function to load data in all or some of these fields whenever you want.
 
