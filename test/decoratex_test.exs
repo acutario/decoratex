@@ -34,4 +34,18 @@ defmodule DecoratexTest do
     assert decorated_model.module_name == TestModel.module_name(test_model)
     assert decorated_model.module_length == TestModel.module_length(test_model)
   end
+
+  test "not decorate a field", %{test_model: test_model} do
+    decorated_model = test_model
+    |> TestModel.decorate(except: :module_name)
+    assert decorated_model.module_name == nil
+    assert decorated_model.module_length == TestModel.module_length(test_model)
+  end
+
+  test "not decorate a list of fields", %{test_model: test_model} do
+    decorated_model = test_model
+    |> TestModel.decorate(except: [:module_name, :module_length])
+    assert decorated_model.module_name == nil
+    assert decorated_model.module_length == nil
+  end
 end

@@ -62,18 +62,20 @@ defmodule Decoratex do
        # Decorate all fields
       |> Post.decorate
 
-      or
-
       # Decorate one fields
       |> Post.decorate(:happy_comments_count)
-
-      or
 
       # Decorate some fields
       |> Post.decorate([:happy_comments_count, ...])
 
-  And use ´post.happy_comments_count´ wherever you want as regular post attrbute
-  in another methods, when decoding as JSON...
+      # Decorate all fields except a one
+      |> Post.decorate(except: :happy_comments_count)
+
+      # Decorate all fields except some
+      |> Post.decorate(except: [:happy_comments_count, ...])
+
+  And use ´post.happy_comments_count´ wherever you want as regular post
+  attribute in another methods, pattern matching, decoding as JSON...
 
   **NOTE:** the fields decoration needs to be defined before de schema
 
@@ -101,8 +103,18 @@ defmodule Decoratex do
         |> Enum.reduce(element, &do_decorate/2)
       end
 
+      @spec decorate(struct(), [except: atom()]) :: struct()
+      def decorate(element, except: name) when is_atom(name), do: decorate(element, except: [name])
+
       @spec decorate(struct(), atom()) :: struct()
       def decorate(element, name) when is_atom(name), do: decorate(element, [name])
+
+      @spec decorate(struct(), [except: list(atom())]) :: struct()
+      def decorate(element, except: names) when is_list(names) do
+        element.__struct__.__decorations__
+        |> Stream.filter(fn(%{name: name}) -> !Enum.member?(names, name) end)
+        |> Enum.reduce(element, &do_decorate/2)
+      end
 
       @spec decorate(struct(), list(atom())) :: struct()
       def decorate(element, names) when is_list(names) do
