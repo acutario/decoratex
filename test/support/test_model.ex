@@ -1,7 +1,6 @@
 defmodule TestModel do
   use Ecto.Schema
   use Decoratex
-  import Ecto.Changeset
 
   decorations do
     decorate_field :module_name, :string, &TestModel.module_name/1

@@ -34,11 +34,13 @@ defmodule Decoratex.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:ecto, "~> 2.0"},
-     {:ex_doc, "~> 0.11", only: :dev},
-     {:earmark, "~> 0.1", only: :dev},
-     {:dialyxir, "~> 0.3", only: :dev},
-     {:credo, "~> 0.4", only: :dev}]
+    [
+      {:ecto, "~> 2.0"},
+      {:ex_doc, "~> 0.11", only: :dev},
+      {:earmark, "~> 0.1", only: :dev},
+      {:dialyxir, "~> 0.3", only: :dev},
+      {:credo, "~> 0.4", only: :dev}
+    ]
   end
 
   # Always compile files in "lib". In tests compile also files in
