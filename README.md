@@ -56,7 +56,7 @@ end
 
 The decorations definition needs to be placed before schema definition, and then, you should add `add_decorations` inside the schema block: this will automatically add the virtual fields to your model.
 
-Finally, you can use the `decorate` funciton of your model module to populate the fields that you need with the function associated to them.
+Finally, you can use the `decorate` function of your model module to populate the fields that you need with the function associated to them.
 
 ```elixir
 post = Post
@@ -71,6 +71,12 @@ post = Post
 
 # Or decorate some fields
 |> Post.decorate([:happy_comments_count, ...])
+
+# Or decorate all fields except one
+|> Post.decorate(except: :troll_comments_count)
+
+# Or decorate all fields except some
+|> Post.decorate(except: [:troll_comments_count, ...])
 
 post.happy_comments_count
 234
