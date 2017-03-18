@@ -1,4 +1,4 @@
-defmodule Decoratex do
+defmodule Decoratex.Decorations do
   @moduledoc """
   Decoratex provides an easy way to add calculated data to your Ecto model structs.
 
@@ -80,74 +80,47 @@ defmodule Decoratex do
 
   """
 
-  defmacro __using__(_opts) do
-    quote do
-      import Decoratex
+  @doc """
+  Decorate function adds the ability to a model for load the decorate fields
+  to it self.
 
-      @decorations %{}
+  You can load all configured fields, load just one with an atom or some
+  with a list.
 
-      @doc """
-      Decorate function adds the ability to a model for load the decorate fields
-      to it self.
-
-      You can load all configured fields, load just one with an atom or some
-      with a list.
-
-      This functions just call the configured function to each field passing
-      the model structure it self and it store the result in the virtual field.
-      """
-      @spec decorate(struct()) :: struct()
-      def decorate(element) do
-        element.__struct__.__decorations__
-        |> Enum.reduce(element, &do_decorate/2)
-      end
-
-      @spec decorate(struct(), [except: atom()]) :: struct()
-      def decorate(element, except: name) when is_atom(name), do: decorate(element, except: [name])
-
-      @spec decorate(struct(), atom()) :: struct()
-      def decorate(element, name) when is_atom(name), do: decorate(element, [name])
-
-      @spec decorate(struct(), [except: list(atom())]) :: struct()
-      def decorate(element, except: names) when is_list(names) do
-        decorate(element, Map.keys(element.__struct__.__decorations__) -- names)
-      end
-
-      @spec decorate(struct(), list(atom())) :: struct()
-      def decorate(element, names) when is_list(names) do
-        names
-        |> Stream.map(&({&1, element.__struct__.__decorations__[&1]}))
-        |> Enum.reduce(element, &do_decorate/2)
-      end
-
-      defp do_decorate({name, %{function: function}}, element) do
-        do_decorate(element, name, function)
-      end
-
-      defp do_decorate(element, name, function) do
-        %{element | name => function.(element)}
-      end
-    end
+  This functions just call the configured function to each field passing
+  the model structure it self and it store the result in the virtual field.
+  """
+  @spec decorate(struct()) :: struct()
+  def decorate(element) do
+    element.__struct__.__decorations__
+    |> Enum.reduce(element, &do_decorate/2)
   end
 
-  defmacro decorations(do: block) do
-    quote do
-      unquote(block)
-      def __decorations__, do: @decorations
-    end
+  @spec decorate(struct(), [except: atom()]) :: struct()
+  def decorate(element, except: name) when is_atom(name), do: decorate(element, except: [name])
+
+  @spec decorate(struct(), atom()) :: struct()
+  def decorate(element, name) when is_atom(name), do: decorate(element, [name])
+
+  @spec decorate(struct(), [except: list(atom())]) :: struct()
+  def decorate(element, except: names) when is_list(names) do
+    element.__struct__.__decorations__
+    |> Stream.filter(fn(%{name: name}) -> !Enum.member?(names, name) end)
+    |> Enum.reduce(element, &do_decorate/2)
   end
 
-  defmacro decorate_field(name, type, function) do
-    quote do
-      @decorations Map.put(@decorations, unquote(name), %{type: unquote(type), function: unquote(function)})
-    end
+  @spec decorate(struct(), list(atom())) :: struct()
+  def decorate(element, names) when is_list(names) do
+    element.__struct__.__decorations__
+    |> Stream.filter(fn(%{name: name}) -> Enum.member?(names, name) end)
+    |> Enum.reduce(element, &do_decorate/2)
   end
 
-  defmacro add_decorations do
-    quote do
-      Enum.each(@decorations, fn({name, %{type: type}}) ->
-        field(name, type, virtual: true)
-      end)
-    end
+  defp do_decorate(%{name: name, function: function}, element) do
+    do_decorate(element, name, function)
+  end
+
+  defp do_decorate(element, name, function) do
+    %{element | name => function.(element)}
   end
 end
