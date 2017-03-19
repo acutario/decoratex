@@ -1,5 +1,6 @@
 # Decoratex
 
+[![Travis](https://img.shields.io/travis/acutario/decoratex.svg?maxAge=2592000&&style=flat-square)](https://travis-ci.org/acutario/decoratex)
 [![Hex.pm](https://img.shields.io/hexpm/dt/decoratex.svg?maxAge=2592000&style=flat-square)](https://hex.pm/packages/decoratex)
 
 Decoratex provides an easy way to add calculated data to your Ecto model structs.
