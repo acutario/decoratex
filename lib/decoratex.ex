@@ -58,25 +58,54 @@ defmodule Decoratex do
 
   Decorate it as you need:
 
-       # Decorate all fields
+      # Decorate all fields
       |> Post.decorate
 
-      # Decorate one fields
+      # Decorate one field with an atom
       |> Post.decorate(:happy_comments_count)
 
-      # Decorate some fields
+      # Decorate some fields with a list
       |> Post.decorate([:happy_comments_count, ...])
 
-      # Decorate all fields except a one
+      # Decorate all fields except one with except key and an atom
       |> Post.decorate(except: :happy_comments_count)
 
-      # Decorate all fields except some
+      # Decorate all fields except some with except key and a list
       |> Post.decorate(except: [:happy_comments_count, ...])
 
   And use ´post.happy_comments_count´ wherever you want as regular post
   attribute in another methods, pattern matching, decoding as JSON...
 
   **NOTE:** the fields decoration needs to be defined before de schema
+
+  ### Decorate with options
+
+  When you need to send some options to the decoration functions, you can
+  define a function with arity 2, and set a default value in declaration.
+  (The default value is mandatory for default decorations:
+
+      ```
+      decorate_field :mention_comments_count, :integer, &PostHelper.count_mention_comments/2, ""
+      ```
+
+  Then, you can pass option the option when the struct is decorated
+
+      ```
+      |> Post.decorate(count_mention_comments: user.nickname)
+      ```
+
+  You can use a keyword list for a complex logic, but you need to care about
+  how to manage options in the decoration function, always with arity/2
+
+      ```
+      |> Post.decorate(censured_comments: [pattern: pattern, replace: "*"])
+      ```
+
+  And you can mix simple and decorations with options with a list:
+
+      ```
+      |> Post.decorate([:happy_comments_count, censured_comments: [pattern: pattern, replace: "*"]])
+      ```
 
   """
 
