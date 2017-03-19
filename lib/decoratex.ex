@@ -116,14 +116,32 @@ defmodule Decoratex do
       @spec decorate(struct(), list(atom())) :: struct()
       def decorate(element, names) when is_list(names) do
         names
-        |> Stream.map(&({&1, element.__struct__.__decorations__[&1]}))
+        |> Stream.map(&process_decoration/1)
         |> Enum.reduce(element, &do_decorate/2)
       end
 
+      @spec process_decoration(atom) :: tuple
+      defp process_decoration(field) when is_atom(field) do
+        {field, __decorations__[field]}
+      end
+      @spec process_decoration(tuple) :: tuple
+      defp process_decoration({field, options}) do
+        {field, Map.put(__decorations__[field], :options, options)}
+      end
+
+      @spec do_decorate(tuple, struct) :: struct
+      defp do_decorate({name, %{function: function, options: options}}, element) do
+        do_decorate(element, name, function, options)
+      end
+      @spec do_decorate(tuple, struct) :: struct
       defp do_decorate({name, %{function: function}}, element) do
         do_decorate(element, name, function)
       end
-
+      @spec do_decorate(struct, atom, (... -> any), any) :: struct
+      defp do_decorate(element, name, function, options) do
+        %{element | name => function.(element, options)}
+      end
+      @spec do_decorate(struct, atom, (... -> any)) :: struct
       defp do_decorate(element, name, function) do
         %{element | name => function.(element)}
       end
@@ -137,9 +155,14 @@ defmodule Decoratex do
     end
   end
 
-  defmacro decorate_field(name, type, function) do
+  defmacro decorate_field(name, type, function, options \\ nil) do
     quote do
-      @decorations Map.put(@decorations, unquote(name), %{type: unquote(type), function: unquote(function)})
+      decoration = case :erlang.fun_info(unquote(function))[:arity] do
+        1 -> %{type: unquote(type), function: unquote(function)}
+        2 -> %{type: unquote(type), function: unquote(function), options: unquote(options)}
+        _ -> raise "Fields only can be decotarated with functions with arity 1 or 2"
+      end
+      @decorations Map.put(@decorations, unquote(name), decoration)
     end
   end
 
