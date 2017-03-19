@@ -96,24 +96,24 @@ defmodule Decoratex do
       This functions just call the configured function to each field passing
       the model structure it self and it store the result in the virtual field.
       """
-      @spec decorate(struct()) :: struct()
+      @spec decorate(struct) :: struct
       def decorate(element) do
         element.__struct__.__decorations__
         |> Enum.reduce(element, &do_decorate/2)
       end
 
-      @spec decorate(struct(), [except: atom()]) :: struct()
+      @spec decorate(struct, except: atom) :: struct
       def decorate(element, except: name) when is_atom(name), do: decorate(element, except: [name])
 
-      @spec decorate(struct(), atom()) :: struct()
+      @spec decorate(struct, atom) :: struct
       def decorate(element, name) when is_atom(name), do: decorate(element, [name])
 
-      @spec decorate(struct(), [except: list(atom())]) :: struct()
+      @spec decorate(struct, except: list(atom)) :: struct
       def decorate(element, except: names) when is_list(names) do
         decorate(element, Map.keys(element.__struct__.__decorations__) -- names)
       end
 
-      @spec decorate(struct(), list(atom())) :: struct()
+      @spec decorate(struct, list) :: struct
       def decorate(element, names) when is_list(names) do
         names
         |> Stream.map(&process_decoration/1)
