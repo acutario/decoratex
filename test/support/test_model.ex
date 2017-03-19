@@ -5,6 +5,8 @@ defmodule TestModel do
   decorations do
     decorate_field :module_name, :string, &TestModel.module_name/1
     decorate_field :module_length, :integer, &TestModel.module_length/1
+    decorate_field :module_contains, :boolean, &TestModel.module_contains?/2, ""
+    decorate_field :module_replace, :boolean, &TestModel.module_replace/2, pattern: "Test", replacement: ""
   end
 
   schema "test_models" do
@@ -12,10 +14,22 @@ defmodule TestModel do
   end
 
   def module_name(element) do
-    to_string(element.__struct__)
+    element.__struct__
+    |> to_string
   end
 
   def module_length(element) do
-    String.length(module_name(element))
+    module_name(element)
+    |> String.length
+  end
+
+  def module_contains?(element, text) do
+    module_name(element)
+    |> String.contains?(text)
+  end
+
+  def module_replace(element, options) do
+    module_name(element)
+    |> String.replace(Keyword.get(options, :pattern), Keyword.get(options, :replacement), Keyword.get(options, :options, []))
   end
 end
