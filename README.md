@@ -1,8 +1,9 @@
 # Decoratex
 
+[![Travis](https://img.shields.io/travis/acutario/decoratex.svg?maxAge=2592000&&style=flat-square)](https://travis-ci.org/acutario/decoratex)
 [![Hex.pm](https://img.shields.io/hexpm/dt/decoratex.svg?maxAge=2592000&style=flat-square)](https://hex.pm/packages/decoratex)
 
-This package allows to add calculated data to your Ecto model structs in an easy way.
+Decoratex provides an easy way to add calculated data to your Ecto model structs.
 
 ## Requirements
 
@@ -40,6 +41,7 @@ defmodule Post do
   decorations do
     decorate_field :happy_comments_count, :integer, &PostHelper.count_happy_comments/1
     decorate_field :troll_comments_count, :integer, &PostHelper.count_troll_comments/1
+    decorate_field :mention_comments_count, :integer, &PostHelper.count_mention_comments/2, ""
     ...
   end
 
@@ -66,18 +68,48 @@ post = Post
 # Decorate all fields
 |> Post.decorate
 
-# Or decorate one fields
+# Decorate one field with an atom
 |> Post.decorate(:happy_comments_count)
 
-# Or decorate some fields
+# Decorate some fields with a list
 |> Post.decorate([:happy_comments_count, ...])
 
-# Or decorate all fields except one
-|> Post.decorate(except: :troll_comments_count)
+# Decorate all fields except one with except key and an atom
+|> Post.decorate(except: :happy_comments_count)
 
-# Or decorate all fields except some
-|> Post.decorate(except: [:troll_comments_count, ...])
+# Decorate all fields except some with except key and a list
+|> Post.decorate(except: [:happy_comments_count, ...])
 
 post.happy_comments_count
 234
 ```
+
+### Decorate with options
+
+When you need to send some options to the decoration functions, you can
+define a function with arity 2, and set a default value in declaration.
+(The default value is mandatory for default decorations:
+
+```
+decorate_field :mention_comments_count, :integer, &PostHelper.count_mention_comments/2, ""
+```
+
+Then, you can pass option the option when the struct is decorated
+
+```
+|> Post.decorate(count_mention_comments: user.nickname)
+```
+
+You can use a keyword list for a complex logic, but you need to care about
+how to manage options in the decoration function, always with arity/2
+
+```
+|> Post.decorate(censured_comments: [pattern: pattern, replace: "*"])
+```
+
+And you can mix simple and decorations with options with a list:
+
+```
+|> Post.decorate([:happy_comments_count, censured_comments: [pattern: pattern, replace: "*"]])
+```
+

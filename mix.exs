@@ -1,7 +1,7 @@
 defmodule Decoratex.Mixfile do
   use Mix.Project
 
-  @version "0.1.1"
+  @version "1.0.0"
 
   def project do
     [app: :decoratex,
@@ -51,8 +51,7 @@ defmodule Decoratex.Mixfile do
 
   defp description do
     """
-    Decoratex allow you to decorate your struct models by adding virtual
-    attributes and load data when you need, keeping the model structure.
+    Decoratex provides an easy way to add calculated data to your Ecto model structs.
     """
   end
 
