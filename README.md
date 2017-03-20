@@ -31,7 +31,15 @@ The package can be installed as simply as adding `decoratex` to your list of dep
 
 ## Usage
 
-First of all, add `use Decoratex` to your models. Then you can set the decorate fields with `decorations` and `decorate_field` functions:
+1. Add `use Decoratex` to your models.
+2. Set the decorate fields inside a block of `decorations` function.
+3. Declare each field with `decorate_field name, type, function, options`
+  * Name of the virtual field.
+  * Type of the virtual field.
+  * Function to calculate the value of the virtual field. Always receives a struct model as first param.
+  * Default options for the function (arity 2) in case you need send diferent options in each decoration.
+4. Add `add_decorations` inside schema definition.
+5. Use `decorate` function of your model module.
 
 ```elixir
 defmodule Post do
@@ -56,7 +64,7 @@ defmodule Post do
 end
 ```
 
-The decorations definition needs to be placed before schema definition, and then, you should add `add_decorations` inside the schema block: this will automatically add the virtual fields to your model.
+The decorations definition needs to be placed before schema definition, and then, you should add `add_decorations` inside the schema block. This will automatically add the virtual fields to your model.
 
 Finally, you can use the `decorate` function of your model module to populate the fields that you need with the function associated to them.
 
@@ -86,22 +94,23 @@ post.happy_comments_count
 
 ### Decorate with options
 
-When you need to send some options to the decoration functions, you can
-define a function with arity 2, and set a default value in declaration.
-(The default value is mandatory for default decorations:
+When you need to send some options to the decoration functions, you can define a function with arity 2, and set a default value in declaration. The default options value is mandatory for default decorations:
 
 ```
-decorate_field :mention_comments_count, :integer, &PostHelper.count_mention_comments/2, ""
+decorate_field :mention_comments_count, {:array, Comment}, &PostHelper.count_mention_comments/2, ""
 ```
 
-Then, you can pass option the option when the struct is decorated
+Then, you can pass the options value when the struct is decorated
 
 ```
 |> Post.decorate(count_mention_comments: user.nickname)
 ```
 
-You can use a keyword list for a complex logic, but you need to care about
-how to manage options in the decoration function, always with arity/2
+You can use a keyword list for a complex logic, but you need to care about how to manage options in the decoration function (always with arity/2), and the default options in the configurtion.
+
+```
+decorate_field :censured_comments, :integer, &PostHelper.censured_comments/2, pattern: "frack", replace: "*"
+```
 
 ```
 |> Post.decorate(censured_comments: [pattern: pattern, replace: "*"])
