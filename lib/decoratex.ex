@@ -28,11 +28,11 @@ defmodule Decoratex do
 
   1. Add `use Decoratex` to your models.
   2. Set the decorate fields inside a block of `decorations` function.
-  3. Declare each field with `decorate_field name, type, function, options`
-    * Name of the virtual field.
-    * Type of the virtual field.
-    * Function to calculate the value of the virtual field. Always receives a struct model as first param.
-    * Default options for the function (arity 2) in case you need send diferent options in each decoration.
+  3. Declare each field with `decorate_field name, type, function, options`.
+      * Name of the virtual field.
+      * Type of the virtual field.
+      * Function to calculate the value of the virtual field. Always receives a struct model as first param.
+      * Default options for the function (arity 2) in case you need to use diferent options in each decoration.
   4. Add `add_decorations` inside schema definition.
   5. Use `decorate` function of your model module.
 
