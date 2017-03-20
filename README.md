@@ -97,7 +97,7 @@ post.happy_comments_count
 When you need to send some options to the decoration functions, you can define a function with arity 2, and set a default value in declaration. The default options value is mandatory for default decorations:
 
 ```
-decorate_field :mention_comments_count, {:array, Comment}, &PostHelper.count_mention_comments/2, ""
+decorate_field :mention_comments_count, :integer, &PostHelper.count_mention_comments/2, ""
 ```
 
 Then, you can pass the options value when the struct is decorated
@@ -109,16 +109,16 @@ Then, you can pass the options value when the struct is decorated
 You can use a keyword list for a complex logic, but you need to care about how to manage options in the decoration function (always with arity/2), and the default options in the configurtion.
 
 ```
-decorate_field :censured_comments, :integer, &PostHelper.censured_comments/2, pattern: "frack", replace: "*"
+decorate_field :censured_comments, {:array, Comment}, &PostHelper.censured_comments/2, pattern: "frack", replace: "*"
 ```
 
 ```
-|> Post.decorate(censured_comments: [pattern: pattern, replace: "*"])
+|> Post.decorate(censured_comments: [pattern: list_of_words, replace: "*"])
 ```
 
 And you can mix simple and decorations with options with a list:
 
 ```
-|> Post.decorate([:happy_comments_count, censured_comments: [pattern: pattern, replace: "*"]])
+|> Post.decorate([:happy_comments_count, censured_comments: [pattern: list_of_words, replace: "*"]])
 ```
 
