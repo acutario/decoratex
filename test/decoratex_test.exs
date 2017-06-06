@@ -85,4 +85,18 @@ defmodule DecoratexTest do
     assert decorated_model.module_name == TestModel.module_name(test_model)
     assert decorated_model.module_length == nil
   end
+
+  test "return nil when nil is passed" do
+    decorated_model = TestModel.decorate(nil)
+    assert is_nil(decorated_model)
+
+    decorated_model = TestModel.decorate(nil, :module_name)
+    assert is_nil(decorated_model)
+
+    decorated_model = TestModel.decorate(nil, [:module_name, :module_length])
+    assert is_nil(decorated_model)
+
+    decorated_model = TestModel.decorate(nil, except: :module_name)
+    assert is_nil(decorated_model)
+  end
 end
