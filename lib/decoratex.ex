@@ -138,11 +138,18 @@ defmodule Decoratex do
       This functions just call the configured function to each field passing
       the model structure it self and it store the result in the virtual field.
       """
+
+      @spec decorate(nil) :: nil
+      def decorate(nil), do: nil
+
       @spec decorate(struct) :: struct
       def decorate(element) do
         element.__struct__.__decorations__
         |> Enum.reduce(element, &do_decorate/2)
       end
+
+      @spec decorate(nil, any) :: nil
+      def decorate(nil, _), do: nil
 
       @spec decorate(struct, except: atom) :: struct
       def decorate(element, except: name) when is_atom(name), do: decorate(element, except: [name])
