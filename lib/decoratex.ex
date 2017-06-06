@@ -138,11 +138,18 @@ defmodule Decoratex do
       This functions just call the configured function to each field passing
       the model structure it self and it store the result in the virtual field.
       """
+
+      @spec decorate(nil) :: nil
+      def decorate(nil), do: nil
+
       @spec decorate(struct) :: struct
       def decorate(element) do
-        element.__struct__.__decorations__
+        element.__struct__.__decorations__()
         |> Enum.reduce(element, &do_decorate/2)
       end
+
+      @spec decorate(nil, any) :: nil
+      def decorate(nil, _), do: nil
 
       @spec decorate(struct, except: atom) :: struct
       def decorate(element, except: name) when is_atom(name), do: decorate(element, except: [name])
@@ -152,7 +159,7 @@ defmodule Decoratex do
 
       @spec decorate(struct, except: list(atom)) :: struct
       def decorate(element, except: names) when is_list(names) do
-        decorate(element, Map.keys(element.__struct__.__decorations__) -- names)
+        decorate(element, Map.keys(element.__struct__.__decorations__()) -- names)
       end
 
       @spec decorate(struct, list) :: struct
@@ -164,11 +171,11 @@ defmodule Decoratex do
 
       @spec process_decoration(atom) :: tuple
       defp process_decoration(field) when is_atom(field) do
-        {field, __decorations__[field]}
+        {field, __decorations__()[field]}
       end
       @spec process_decoration(tuple) :: tuple
       defp process_decoration({field, options}) do
-        {field, Map.put(__decorations__[field], :options, options)}
+        {field, Map.put(__decorations__()[field], :options, options)}
       end
 
       @spec do_decorate(tuple, struct) :: struct
@@ -193,7 +200,7 @@ defmodule Decoratex do
   defmacro decorations(do: block) do
     quote do
       unquote(block)
-      def __decorations__, do: @decorations
+      def __decorations__(), do: @decorations
     end
   end
 

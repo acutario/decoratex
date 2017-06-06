@@ -13,8 +13,8 @@ defmodule Decoratex.Mixfile do
      elixirc_paths: elixirc_paths(Mix.env),
      # Docs
      name: "Decoratex",
-     description: description,
-     package: package]
+     description: description(),
+     package: package()]
   end
 
   # Configuration for the OTP application
@@ -45,8 +45,8 @@ defmodule Decoratex.Mixfile do
 
   # Always compile files in "lib". In tests compile also files in
   # "test/support"
-  def elixirc_paths(:test), do: elixirc_paths ++ ["test/support"]
-  def elixirc_paths(_), do: elixirc_paths
+  def elixirc_paths(:test), do: elixirc_paths() ++ ["test/support"]
+  def elixirc_paths(_), do: elixirc_paths()
   def elixirc_paths, do: ["lib"]
 
   defp description do
