@@ -1,6 +1,7 @@
 defmodule TestModel do
-  use Ecto.Schema
-  use Decoratex
+  @moduledoc false
+
+  use TestSchema
 
   decorations do
     decorate_field :module_name, :string, &TestModel.module_name/1
