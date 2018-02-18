@@ -137,6 +137,7 @@ defmodule Decoratex do
   end
 
   @doc false
+  # credo:disable-for-next-line
   # TODO: move decorate methods to another module and remove credo exception
   # credo:disable-for-next-line
   defmacro decorations(do: block) do
