@@ -120,6 +120,13 @@ defmodule Decoratex do
       |> Post.decorate([:happy_comments_count, censured_comments: [pattern: list_of_words, replace: "*"]])
       ```
 
+  ## Reflection
+
+  Any decorated module will generate the `__decorate__` function that can be
+  used for runtime introspection of the decorations:
+
+  * `__decoration__(field)` - Returns the decortions of a field in format `%{type: type, function: function, options: options}`;
+
   """
 
   @doc false
