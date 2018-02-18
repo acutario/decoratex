@@ -120,19 +120,42 @@ defmodule Decoratex do
       |> Post.decorate([:happy_comments_count, censured_comments: [pattern: list_of_words, replace: "*"]])
       ```
 
+  ## Reflection
+
+  Any decorated module will generate the `__decorate__` function that can be
+  used for runtime introspection of the decorations:
+
+  * `__decoration__(field)` - Returns the decortions of a field in format `%{type: type, function: function, options: options}`;
+
   """
 
-  defmacro __using__(_opts) do
+  @doc false
+  defmacro __using__(_) do
     quote do
-      import Decoratex
+      import Decoratex, only: [decorations: 1, add_decorations: 0]
     end
   end
 
+  @doc false
+  # credo:disable-for-next-line
+  # TODO: move decorate methods to another module and remove credo exception
+  # credo:disable-for-next-line
   defmacro decorations(do: block) do
     quote do
-      @decorations %{}
-      unquote(block)
-      def __decorations__, do: @decorations
+      Module.register_attribute(__MODULE__, :decorations, accumulate: true)
+
+      try do
+        import Decoratex
+        unquote(block)
+      after
+        :ok
+      end
+
+      decorations = Enum.reverse(@decorations)
+
+      Module.eval_quoted(__ENV__, [
+        Decoratex.__decorations__(decorations)
+      ])
 
       @doc """
       Decorate function adds the ability to a model for load the decorate fields
@@ -149,8 +172,7 @@ defmodule Decoratex do
 
       @spec decorate(struct) :: struct
       def decorate(element) do
-        element.__struct__.__decorations__()
-        |> Enum.reduce(element, &do_decorate/2)
+        @decorations |> Enum.reduce(element, &do_decorate/2)
       end
 
       @spec decorate(nil, any) :: nil
@@ -164,8 +186,9 @@ defmodule Decoratex do
       def decorate(element, name) when is_atom(name), do: decorate(element, [name])
 
       @spec decorate(struct, except: list(atom)) :: struct
-      def decorate(element, except: names) when is_list(names) do
-        decorate(element, Map.keys(element.__struct__.__decorations__()) -- names)
+      def decorate(element, except: exceptions) when is_list(exceptions) do
+        names = @decorations |> Enum.map(fn {name, _decoration} -> name end)
+        decorate(element, names -- exceptions)
       end
 
       @spec decorate(struct, list) :: struct
@@ -177,12 +200,12 @@ defmodule Decoratex do
 
       @spec process_decoration(atom) :: tuple
       defp process_decoration(field) when is_atom(field) do
-        {field, __decorations__()[field]}
+        {field, __decoration__(field)}
       end
 
       @spec process_decoration(tuple) :: tuple
       defp process_decoration({field, options}) do
-        {field, Map.put(__decorations__()[field], :options, options)}
+        {field, Map.put(__decoration__(field), :options, options)}
       end
 
       @spec do_decorate(tuple, struct) :: struct
@@ -207,19 +230,47 @@ defmodule Decoratex do
     end
   end
 
-  defmacro decorate_field(name, type, function, options \\ nil) do
-    quote do
-      decoration =
-        case :erlang.fun_info(unquote(function))[:arity] do
-          1 -> %{type: unquote(type), function: unquote(function)}
-          2 -> %{type: unquote(type), function: unquote(function), options: unquote(options)}
-          _ -> raise "Fields only can be decotarated with functions with arity 1 or 2"
+  @doc false
+  def __decorations__(decorations) do
+    decorations_quoted =
+      Enum.map(decorations, fn {name, decoration} ->
+        quote do
+          def __decoration__(unquote(name)), do: unquote(Macro.escape(decoration))
         end
+      end)
 
-      @decorations Map.put(@decorations, unquote(name), decoration)
+    quote do
+      unquote(decorations_quoted)
+      def __decoration__(_), do: nil
     end
   end
 
+  @doc false
+  defmacro decorate_field(name, type, function, options \\ nil) do
+    quote do
+      Decoratex.__decorate_field__(
+        __MODULE__,
+        unquote(name),
+        unquote(type),
+        unquote(function),
+        unquote(options)
+      )
+    end
+  end
+
+  @doc false
+  def __decorate_field__(module, name, type, function, options) do
+    decoration =
+      case :erlang.fun_info(function)[:arity] do
+        1 -> %{type: type, function: function}
+        2 -> %{type: type, function: function, options: options}
+        _ -> raise "Fields only can be decotarated with functions with arity 1 or 2"
+      end
+
+    Module.put_attribute(module, :decorations, {name, decoration})
+  end
+
+  @doc false
   defmacro add_decorations do
     quote do
       Enum.each(@decorations, fn {name, %{type: type}} ->
