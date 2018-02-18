@@ -1,12 +1,43 @@
 language: elixir
 elixir:
-  - 1.3.2
-  - 1.3.3
-  - 1.3.4
-  - 1.4.0
-  - 1.4.1
+  - 1.6.1
 otp_release:
-  - 18.3
-  - 19.0
-  - 19.1
-  - 19.2
+  - 20.2
+matrix:
+  include:
+  - otp_release: 18.3
+    elixir: 1.4.5
+  - otp_release: 19.3
+    elixir: 1.5.3
+env:
+  matrix:
+    - MIX_ENV=test
+install:
+  - mix local.hex --force
+  - mix local.rebar --force
+  - mix deps.get
+after_script:
+  - mix deps.get --only docs
+  - MIX_ENV=docs mix inch.report
+
+matrix:
+  include:
+    - elixir: 1.3
+      otp_release: 18.3
+    - elixir: 1.3
+      otp_release: 19.3
+    - elixir: 1.4
+      otp_release: 19.3
+env:
+  - MIX_ENV=test
+
+cache:
+  directories:
+    - deps
+    - _build
+
+script:
+  - mix compile --warning-as-errors
+  - if [ "$TRAVIS_ELIXIR_VERSION" == "1.6.0" ]; then mix format --check-formatted; fi
+  - mix credo
+  - mix test
