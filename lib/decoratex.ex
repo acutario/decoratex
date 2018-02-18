@@ -125,8 +125,14 @@ defmodule Decoratex do
   defmacro __using__(_opts) do
     quote do
       import Decoratex
+    end
+  end
 
+  defmacro decorations(do: block) do
+    quote do
       @decorations %{}
+      unquote(block)
+      def __decorations__(), do: @decorations
 
       @doc """
       Decorate function adds the ability to a model for load the decorate fields
@@ -138,7 +144,6 @@ defmodule Decoratex do
       This functions just call the configured function to each field passing
       the model structure it self and it store the result in the virtual field.
       """
-
       @spec decorate(nil) :: nil
       def decorate(nil), do: nil
 
@@ -194,13 +199,6 @@ defmodule Decoratex do
       defp do_decorate(element, name, function) do
         %{element | name => function.(element)}
       end
-    end
-  end
-
-  defmacro decorations(do: block) do
-    quote do
-      unquote(block)
-      def __decorations__(), do: @decorations
     end
   end
 
