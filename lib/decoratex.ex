@@ -132,7 +132,7 @@ defmodule Decoratex do
     quote do
       @decorations %{}
       unquote(block)
-      def __decorations__(), do: @decorations
+      def __decorations__, do: @decorations
 
       @doc """
       Decorate function adds the ability to a model for load the decorate fields

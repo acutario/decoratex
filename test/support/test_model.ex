@@ -14,7 +14,7 @@ defmodule TestModel do
   end
 
   schema "test_models" do
-    add_decorations()
+    add_decorations
   end
 
   def module_name(element) do
@@ -23,17 +23,20 @@ defmodule TestModel do
   end
 
   def module_length(element) do
-    module_name(element)
+    element
+    |> module_name()
     |> String.length()
   end
 
   def module_contains?(element, text) do
-    module_name(element)
+    element
+    |> module_name()
     |> String.contains?(text)
   end
 
   def module_replace(element, options) do
-    module_name(element)
+    element
+    |> module_name()
     |> String.replace(
       Keyword.get(options, :pattern),
       Keyword.get(options, :replacement),
