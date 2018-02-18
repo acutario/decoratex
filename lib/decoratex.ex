@@ -151,7 +151,7 @@ defmodule Decoratex do
         :ok
       end
 
-      decorations = @decorations |> Enum.reverse()
+      decorations = Enum.reverse(@decorations)
 
       Module.eval_quoted(__ENV__, [
         Decoratex.__decorations__(decorations)
@@ -172,8 +172,7 @@ defmodule Decoratex do
 
       @spec decorate(struct) :: struct
       def decorate(element) do
-        @decorations
-        |> Enum.reduce(element, &do_decorate/2)
+        @decorations |> Enum.reduce(element, &do_decorate/2)
       end
 
       @spec decorate(nil, any) :: nil
@@ -188,10 +187,7 @@ defmodule Decoratex do
 
       @spec decorate(struct, except: list(atom)) :: struct
       def decorate(element, except: exceptions) when is_list(exceptions) do
-        names =
-          @decorations
-          |> Enum.map(fn {name, _decoration} -> name end)
-
+        names = @decorations |> Enum.map(fn {name, _decoration} -> name end)
         decorate(element, names -- exceptions)
       end
 
