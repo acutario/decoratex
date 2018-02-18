@@ -4,17 +4,19 @@ defmodule Decoratex.Mixfile do
   @version "1.0.1"
 
   def project do
-    [app: :decoratex,
-     version: @version,
-     elixir: "~> 1.4",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps(),
-     elixirc_paths: elixirc_paths(Mix.env),
-     # Docs
-     name: "Decoratex",
-     description: description(),
-     package: package()]
+    [
+      app: :decoratex,
+      version: @version,
+      elixir: "~> 1.4",
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env()),
+      # Docs
+      name: "Decoratex",
+      description: description(),
+      package: package()
+    ]
   end
 
   # Configuration for the OTP application
@@ -57,10 +59,10 @@ defmodule Decoratex.Mixfile do
 
   defp package do
     [
-    files: ["lib", "mix.exs", "README.md"],
-    maintainers: ["Rubén Sierra González"],
-    licenses: ["MIT"],
-    links: %{"GitHub" => "https://github.com/acutario/decoratex"}
+      files: ["lib", "mix.exs", "README.md"],
+      maintainers: ["Rubén Sierra González"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/acutario/decoratex"}
     ]
   end
 end

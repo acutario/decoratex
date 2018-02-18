@@ -1,16 +1,20 @@
 defmodule TestModel do
-  use Ecto.Schema
-  use Decoratex
+  @moduledoc false
+
+  use TestSchema
 
   decorations do
     decorate_field :module_name, :string, &TestModel.module_name/1
     decorate_field :module_length, :integer, &TestModel.module_length/1
     decorate_field :module_contains, :boolean, &TestModel.module_contains?/2, ""
-    decorate_field :module_replace, :boolean, &TestModel.module_replace/2, pattern: "Test", replacement: ""
+
+    decorate_field :module_replace, :boolean, &TestModel.module_replace/2,
+      pattern: "Test",
+      replacement: ""
   end
 
   schema "test_models" do
-    add_decorations()
+    add_decorations
   end
 
   def module_name(element) do
@@ -19,17 +23,24 @@ defmodule TestModel do
   end
 
   def module_length(element) do
-    module_name(element)
-    |> String.length
+    element
+    |> module_name()
+    |> String.length()
   end
 
   def module_contains?(element, text) do
-    module_name(element)
+    element
+    |> module_name()
     |> String.contains?(text)
   end
 
   def module_replace(element, options) do
-    module_name(element)
-    |> String.replace(Keyword.get(options, :pattern), Keyword.get(options, :replacement), Keyword.get(options, :options, []))
+    element
+    |> module_name()
+    |> String.replace(
+      Keyword.get(options, :pattern),
+      Keyword.get(options, :replacement),
+      Keyword.get(options, :options, [])
+    )
   end
 end
