@@ -264,7 +264,7 @@ defmodule Decoratex do
       case :erlang.fun_info(function)[:arity] do
         1 -> %{type: type, function: function}
         2 -> %{type: type, function: function, options: options}
-        _ -> raise "Fields only can be decotarated with functions with arity 1 or 2"
+        _ -> raise "Fields can only be decorated with functions of arity 1 or 2"
       end
 
     Module.put_attribute(module, :decorations, {name, decoration})
