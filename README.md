@@ -39,7 +39,7 @@ The package can be installed as simply as adding `decoratex` to your list of dep
     * Function to calculate the value of the virtual field. Always receives a struct model as first param.
     * Default options for the function (arity 2) in case you need to use diferent options in each decoration.
 4. Add `decorations()` inside schema definition.
-5. Use `decorate` function of your model module.
+5. Use `Decoratex.perform` function with your model.
 
 ```elixir
 defmodule Post do
@@ -75,19 +75,19 @@ post = Post
 |> Repo.preload(:comments))
 
 # Decorate all fields
-|> Post.decorate
+|> Decoratex.perform
 
 # Decorate one field with an atom
-|> Post.decorate(:happy_comments_count)
+|> Decoratex.perform(:happy_comments_count)
 
 # Decorate some fields with a list
-|> Post.decorate([:happy_comments_count, ...])
+|> Decoratex.perform([:happy_comments_count, ...])
 
 # Decorate all fields except one with except key and an atom
-|> Post.decorate(except: :happy_comments_count)
+|> Decoratex.perform(except: :happy_comments_count)
 
 # Decorate all fields except some with except key and a list
-|> Post.decorate(except: [:happy_comments_count, ...])
+|> Decoratex.perform(except: [:happy_comments_count, ...])
 
 post.happy_comments_count
 234
@@ -104,7 +104,7 @@ decorate_field :mention_comments_count, :integer, &PostHelper.count_mention_comm
 Then, you can pass the options value when the struct is decorated
 
 ```
-|> Post.decorate(count_mention_comments: user.nickname)
+|> Decoratex.perform(count_mention_comments: user.nickname)
 ```
 
 You can use a keyword list for a complex logic, but you need to care about how to manage options in the decoration function (always with arity/2), and the default options in the configurtion.
@@ -114,11 +114,11 @@ decorate_field :censured_comments, {:array, Comment}, &PostHelper.censured_comme
 ```
 
 ```
-|> Post.decorate(censured_comments: [pattern: list_of_words, replace: "*"])
+|> Decoratex.perform(censured_comments: [pattern: list_of_words, replace: "*"])
 ```
 
 And you can mix simple and decorations with options with a list:
 
 ```
-|> Post.decorate([:happy_comments_count, censured_comments: [pattern: list_of_words, replace: "*"]])
+|> Decoratex.perform([:happy_comments_count, censured_comments: [pattern: list_of_words, replace: "*"]])
 ```

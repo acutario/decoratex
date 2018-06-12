@@ -10,7 +10,7 @@ defmodule DecoratexTest do
   test "decorate all fields", %{test_model: test_model} do
     decorated_model =
       test_model
-      |> TestModel.decorate()
+      |> Decoratex.perform()
 
     assert decorated_model.module_name == TestModel.module_name(test_model)
     assert decorated_model.module_length == TestModel.module_length(test_model)
@@ -19,7 +19,7 @@ defmodule DecoratexTest do
   test "decorate one field", %{test_model: test_model} do
     decorated_model =
       test_model
-      |> TestModel.decorate(:module_name)
+      |> Decoratex.perform(:module_name)
 
     assert decorated_model.module_name == TestModel.module_name(test_model)
     assert decorated_model.module_length == nil
@@ -28,7 +28,7 @@ defmodule DecoratexTest do
   test "decorate other field", %{test_model: test_model} do
     decorated_model =
       test_model
-      |> TestModel.decorate(:module_length)
+      |> Decoratex.perform(:module_length)
 
     assert decorated_model.module_name == nil
     assert decorated_model.module_length == TestModel.module_length(test_model)
@@ -37,7 +37,7 @@ defmodule DecoratexTest do
   test "decorate a list of fields", %{test_model: test_model} do
     decorated_model =
       test_model
-      |> TestModel.decorate([:module_name, :module_length])
+      |> Decoratex.perform([:module_name, :module_length])
 
     assert decorated_model.module_name == TestModel.module_name(test_model)
     assert decorated_model.module_length == TestModel.module_length(test_model)
@@ -46,7 +46,7 @@ defmodule DecoratexTest do
   test "not decorate a field", %{test_model: test_model} do
     decorated_model =
       test_model
-      |> TestModel.decorate(except: :module_name)
+      |> Decoratex.perform(except: :module_name)
 
     assert decorated_model.module_name == nil
     assert decorated_model.module_length == TestModel.module_length(test_model)
@@ -55,7 +55,7 @@ defmodule DecoratexTest do
   test "not decorate a list of fields", %{test_model: test_model} do
     decorated_model =
       test_model
-      |> TestModel.decorate(except: [:module_name, :module_length])
+      |> Decoratex.perform(except: [:module_name, :module_length])
 
     assert decorated_model.module_name == nil
     assert decorated_model.module_length == nil
@@ -66,7 +66,7 @@ defmodule DecoratexTest do
 
     decorated_model =
       test_model
-      |> TestModel.decorate(module_contains: text)
+      |> Decoratex.perform(module_contains: text)
 
     assert decorated_model.module_contains == TestModel.module_contains?(test_model, text)
   end
@@ -77,7 +77,7 @@ defmodule DecoratexTest do
 
     decorated_model =
       test_model
-      |> TestModel.decorate(module_replace: [pattern: pattern, replacement: replacement])
+      |> Decoratex.perform(module_replace: [pattern: pattern, replacement: replacement])
 
     assert decorated_model.module_replace ==
              TestModel.module_replace(test_model, pattern: pattern, replacement: replacement)
@@ -90,7 +90,7 @@ defmodule DecoratexTest do
 
     decorated_model =
       test_model
-      |> TestModel.decorate(
+      |> Decoratex.perform(
         module_contains: text,
         module_replace: [pattern: pattern, replacement: replacement]
       )
@@ -108,7 +108,7 @@ defmodule DecoratexTest do
 
     decorated_model =
       test_model
-      |> TestModel.decorate([:module_name, module_contains: text])
+      |> Decoratex.perform([:module_name, module_contains: text])
 
     assert decorated_model.module_replace == nil
     assert decorated_model.module_contains == TestModel.module_contains?(test_model, text)
@@ -117,16 +117,16 @@ defmodule DecoratexTest do
   end
 
   test "return nil when nil is passed" do
-    decorated_model = TestModel.decorate(nil)
+    decorated_model = Decoratex.perform(nil)
     assert is_nil(decorated_model)
 
-    decorated_model = TestModel.decorate(nil, :module_name)
+    decorated_model = Decoratex.perform(nil, :module_name)
     assert is_nil(decorated_model)
 
-    decorated_model = TestModel.decorate(nil, [:module_name, :module_length])
+    decorated_model = Decoratex.perform(nil, [:module_name, :module_length])
     assert is_nil(decorated_model)
 
-    decorated_model = TestModel.decorate(nil, except: :module_name)
+    decorated_model = Decoratex.perform(nil, except: :module_name)
     assert is_nil(decorated_model)
   end
 end
