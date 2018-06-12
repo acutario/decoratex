@@ -33,8 +33,8 @@ defmodule Decoratex do
       * Type of the virtual field.
       * Function to calculate the value of the virtual field. Always receives a struct model as first param.
       * Default options for the function (arity 2) in case you need to use diferent options in each decoration.
-  4. Add `add_decorations` inside schema definition.
   5. Use `decorate` function of your model module.
+  4. Add `decorations()` inside schema definition.
 
   ## Usage examples
 
@@ -58,7 +58,8 @@ defmodule Decoratex do
           field :title, :string
           field :body, :string
 
-          add_decorations
+          timestamps()
+          decorations()
         end
       end
 
@@ -132,7 +133,7 @@ defmodule Decoratex do
   @doc false
   defmacro __using__(_) do
     quote do
-      import Decoratex, only: [decorations: 1, add_decorations: 0]
+      import Decoratex, only: [decorations: 0, decorations: 1]
     end
   end
 
@@ -160,6 +161,14 @@ defmodule Decoratex do
       @doc """
       Decorate function adds the ability to a model for load the decorate fields
       to it self.
+  @doc false
+  defmacro decorations do
+    quote do
+      Enum.each(@decorations, fn {name, %{type: type}} ->
+        field(name, type, virtual: true)
+      end)
+    end
+  end
 
       You can load all configured fields, load just one with an atom or some
       with a list.
@@ -268,14 +277,5 @@ defmodule Decoratex do
       end
 
     Module.put_attribute(module, :decorations, {name, decoration})
-  end
-
-  @doc false
-  defmacro add_decorations do
-    quote do
-      Enum.each(@decorations, fn {name, %{type: type}} ->
-        field(name, type, virtual: true)
-      end)
-    end
   end
 end

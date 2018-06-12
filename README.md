@@ -38,7 +38,7 @@ The package can be installed as simply as adding `decoratex` to your list of dep
     * Type of the virtual field.
     * Function to calculate the value of the virtual field. Always receives a struct model as first param.
     * Default options for the function (arity 2) in case you need to use diferent options in each decoration.
-4. Add `add_decorations` inside schema definition.
+4. Add `decorations()` inside schema definition.
 5. Use `decorate` function of your model module.
 
 ```elixir
@@ -59,12 +59,13 @@ defmodule Post do
     field :title, :string
     field :body, :string
 
-    add_decorations
+    timestamps()
+    decorations()
   end
 end
 ```
 
-The decorations definition needs to be placed before schema definition, and then, you should add `add_decorations` inside the schema block. This will automatically add the virtual fields to your model.
+The decorations definition needs to be placed before schema definition, and then, you should add `decorations()` inside the schema block. This will automatically add the virtual fields to your model.
 
 Finally, you can use the `decorate` function of your model module to populate the fields that you need with the function associated to them.
 
@@ -121,4 +122,3 @@ And you can mix simple and decorations with options with a list:
 ```
 |> Post.decorate([:happy_comments_count, censured_comments: [pattern: list_of_words, replace: "*"]])
 ```
-

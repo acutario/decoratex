@@ -14,7 +14,7 @@ defmodule TestModel do
   end
 
   schema "test_models" do
-    add_decorations()
+    decorations()
   end
 
   def module_name(element) do
