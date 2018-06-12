@@ -25,7 +25,7 @@ The package can be installed as simply as adding `decoratex` to your list of dep
 
 ```elixir
   def deps do
-    [{:decoratex, "~> 1.0.0"}]
+    [{:decoratex, "~> 1.1.0"}]
   end
 ```
 
