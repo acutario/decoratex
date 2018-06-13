@@ -31,7 +31,7 @@ The package can be installed as simply as adding `decoratex` to your list of dep
 
 ## Usage
 
-1. Add `use Decoratex` to your models.
+1. Add `use Decoratex.Schema` to your models.
 2. Set the decorate fields inside a block of `decorations` function.
 3. Declare each field with `decorate_field name, type, function, options`.
     * Name of the virtual field.

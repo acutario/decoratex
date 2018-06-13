@@ -26,7 +26,7 @@ defmodule Decoratex do
 
   ## Usage
 
-  1. Add `use Decoratex` to your models.
+  1. Add `use Decoratex.Schema` to your models.
   2. Set the decorate fields inside a block of `decorations` function.
   3. Declare each field with `decorate_field name, type, function, options`.
       * Name of the virtual field.
@@ -44,7 +44,7 @@ defmodule Decoratex do
 
       defmodule Post do
         use Ecto.Schema
-        use Decoratex
+        use Decoratex.Schema
 
         decorations do
           decorate_field :happy_comments_count, :integer, &PostHelper.count_happy_comments/1
@@ -131,45 +131,6 @@ defmodule Decoratex do
 
   """
 
-  @doc false
-  defmacro __using__(_) do
-    quote do
-      import Decoratex, only: [decorations: 0, decorations: 1]
-    end
-  end
-
-  @doc false
-  # credo:disable-for-next-line
-  # TODO: move decorate methods to another module and remove credo exception
-  # credo:disable-for-next-line
-  defmacro decorations(do: block) do
-    quote do
-      Module.register_attribute(__MODULE__, :decorations, accumulate: true)
-
-      try do
-        import Decoratex
-        unquote(block)
-      after
-        :ok
-      end
-
-      decorations = Enum.reverse(@decorations)
-
-      Module.eval_quoted(__ENV__, [
-        Decoratex.__decorations__(decorations)
-      ])
-    end
-  end
-
-  @doc false
-  defmacro decorations do
-    quote do
-      Enum.each(@decorations, fn {name, %{type: type}} ->
-        field(name, type, virtual: true)
-      end)
-    end
-  end
-
   @doc """
   Decorate function adds the ability to a model for load the decorate fields
   to it self.
@@ -239,46 +200,5 @@ defmodule Decoratex do
   @spec decorate(struct, atom, (... -> any)) :: struct
   defp decorate(element, name, function) do
     %{element | name => function.(element)}
-  end
-
-  @doc false
-  def __decorations__(decorations) do
-    decorations_quoted =
-      Enum.map(decorations, fn {name, decoration} ->
-        quote do
-          def __decoration__(unquote(name)), do: unquote(Macro.escape(decoration))
-        end
-      end)
-
-    quote do
-      unquote(decorations_quoted)
-      def __decoration__(_), do: nil
-      def __decorations__, do: unquote(Macro.escape(decorations))
-    end
-  end
-
-  @doc false
-  defmacro decorate_field(name, type, function, options \\ nil) do
-    quote do
-      Decoratex.__decorate_field__(
-        __MODULE__,
-        unquote(name),
-        unquote(type),
-        unquote(function),
-        unquote(options)
-      )
-    end
-  end
-
-  @doc false
-  def __decorate_field__(module, name, type, function, options) do
-    decoration =
-      case :erlang.fun_info(function)[:arity] do
-        1 -> %{type: type, function: function}
-        2 -> %{type: type, function: function, options: options}
-        _ -> raise "Fields can only be decorated with functions of arity 1 or 2"
-      end
-
-    Module.put_attribute(module, :decorations, {name, decoration})
   end
 end
