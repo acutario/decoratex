@@ -1,7 +1,10 @@
 defmodule Decoratex.Schema do
   @moduledoc """
-  This module add the macro functions
+  This module add the macro functions for the module schemas to add the decorate
+  fields definition
   """
+
+  alias Decoratex.Schema
 
   @doc false
   defmacro __using__(_) do
@@ -25,7 +28,7 @@ defmodule Decoratex.Schema do
       decorations = Enum.reverse(@decorations)
 
       Module.eval_quoted(__ENV__, [
-        Decoratex.Schema.__decorations__(decorations)
+        Schema.__decorations__(decorations)
       ])
     end
   end
@@ -42,7 +45,7 @@ defmodule Decoratex.Schema do
   @doc false
   defmacro decorate_field(name, type, function, options \\ nil) do
     quote do
-      Decoratex.Schema.__decorate_field__(
+      Schema.__decorate_field__(
         __MODULE__,
         unquote(name),
         unquote(type),
