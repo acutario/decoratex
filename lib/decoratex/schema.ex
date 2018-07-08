@@ -1,7 +1,21 @@
 defmodule Decoratex.Schema do
   @moduledoc """
   This module add the macro functions for the module schemas to add the decorate
-  fields definition
+  fields definitions.
+
+  The macro decorations/1 accepts a block with decorate_fields definitions,
+  and decorations/0 add the virtual fields in the ecto schema to keep the values
+  of decoration functions.
+
+    decorations do
+      decorate_field :field_name, :type, &decoration_method/1
+      ...
+    end
+
+    schema "my_schemas" do
+      ...
+      decorations()
+    end
   """
 
   alias Decoratex.Schema
