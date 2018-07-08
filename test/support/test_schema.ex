@@ -5,7 +5,7 @@ defmodule TestSchema do
   defmacro __using__(_) do
     quote do
       use Ecto.Schema
-      use Decoratex
+      use Decoratex.Schema
     end
   end
 end

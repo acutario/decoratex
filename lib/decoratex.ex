@@ -26,15 +26,15 @@ defmodule Decoratex do
 
   ## Usage
 
-  1. Add `use Decoratex` to your models.
+  1. Add `use Decoratex.Schema` to your models.
   2. Set the decorate fields inside a block of `decorations` function.
   3. Declare each field with `decorate_field name, type, function, options`.
       * Name of the virtual field.
       * Type of the virtual field.
       * Function to calculate the value of the virtual field. Always receives a struct model as first param.
       * Default options for the function (arity 2) in case you need to use diferent options in each decoration.
-  4. Add `add_decorations` inside schema definition.
-  5. Use `decorate` function of your model module.
+  4. Add `decorations()` inside schema definition.
+  5. Use `Decoratex.decorate` function with your model.
 
   ## Usage examples
 
@@ -44,7 +44,7 @@ defmodule Decoratex do
 
       defmodule Post do
         use Ecto.Schema
-        use Decoratex
+        use Decoratex.Schema
 
         decorations do
           decorate_field :happy_comments_count, :integer, &PostHelper.count_happy_comments/1
@@ -58,7 +58,8 @@ defmodule Decoratex do
           field :title, :string
           field :body, :string
 
-          add_decorations
+          timestamps()
+          decorations()
         end
       end
 
@@ -71,19 +72,19 @@ defmodule Decoratex do
   Decorate it as you need:
 
       # Decorate all fields
-      |> Post.decorate
+      |> Decoratex.decorate
 
       # Decorate one field with an atom
-      |> Post.decorate(:happy_comments_count)
+      |> Decoratex.decorate(:happy_comments_count)
 
       # Decorate some fields with a list
-      |> Post.decorate([:happy_comments_count, ...])
+      |> Decoratex.decorate([:happy_comments_count, ...])
 
       # Decorate all fields except one with except key and an atom
-      |> Post.decorate(except: :happy_comments_count)
+      |> Decoratex.decorate(except: :happy_comments_count)
 
       # Decorate all fields except some with except key and a list
-      |> Post.decorate(except: [:happy_comments_count, ...])
+      |> Decoratex.decorate(except: [:happy_comments_count, ...])
 
   And use ´post.happy_comments_count´ wherever you want as regular post
   attribute in another methods, pattern matching, decoding as JSON...
@@ -101,7 +102,7 @@ defmodule Decoratex do
   Then, you can pass the options value when the struct is decorated
 
       ```
-      |> Post.decorate(count_mention_comments: user.nickname)
+      |> Decoratex.decorate(count_mention_comments: user.nickname)
       ```
 
   You can use a keyword list for a complex logic, but you need to care about how to manage options in the decoration function (always with arity/2), and the default options in the configurtion.
@@ -111,13 +112,13 @@ defmodule Decoratex do
       ```
 
       ```
-      |> Post.decorate(censured_comments: [pattern: list_of_words, replace: "*"])
+      |> Decoratex.decorate(censured_comments: [pattern: list_of_words, replace: "*"])
       ```
 
   And you can mix simple and decorations with options with a list:
 
       ```
-      |> Post.decorate([:happy_comments_count, censured_comments: [pattern: list_of_words, replace: "*"]])
+      |> Decoratex.decorate([:happy_comments_count, censured_comments: [pattern: list_of_words, replace: "*"]])
       ```
 
   ## Reflection
@@ -125,157 +126,78 @@ defmodule Decoratex do
   Any decorated module will generate the `__decorate__` function that can be
   used for runtime introspection of the decorations:
 
-  * `__decoration__(field)` - Returns the decortions of a field in format `%{type: type, function: function, options: options}`;
+  * `__decoration__(field)` - Returns the decorations of a field in format `%{type: type, function: function, options: options}`;
+  * `__decorations__()` - Returns all decorations of a field in format `[{field, %{type: type, function: function, options: options}}, ...]`;
 
   """
 
-  @doc false
-  defmacro __using__(_) do
-    quote do
-      import Decoratex, only: [decorations: 1, add_decorations: 0]
-    end
+  @doc """
+  Decorate function adds the ability to a model for load the decorate fields
+  to it self.
+
+  You can load all configured fields, load just one with an atom or some
+  with a list.
+
+  This functions just call the configured function to each field passing
+  the model structure it self and it store the result in the virtual field.
+  """
+  @spec decorate(nil) :: nil
+  def decorate(nil), do: nil
+
+  @spec decorate(struct) :: struct
+  def decorate(%module{} = element) do
+    module.__decorations__ |> Enum.reduce(element, &do_decorate/2)
   end
 
-  @doc false
-  # credo:disable-for-next-line
-  # TODO: move decorate methods to another module and remove credo exception
-  # credo:disable-for-next-line
-  defmacro decorations(do: block) do
-    quote do
-      Module.register_attribute(__MODULE__, :decorations, accumulate: true)
+  @spec decorate(nil, any) :: nil
+  def decorate(nil, _), do: nil
 
-      try do
-        import Decoratex
-        unquote(block)
-      after
-        :ok
-      end
+  @spec decorate(struct, except: atom) :: struct
+  def decorate(element, except: name) when is_atom(name), do: decorate(element, except: [name])
 
-      decorations = Enum.reverse(@decorations)
+  @spec decorate(struct, atom) :: struct
+  def decorate(element, name) when is_atom(name), do: decorate(element, [name])
 
-      Module.eval_quoted(__ENV__, [
-        Decoratex.__decorations__(decorations)
-      ])
-
-      @doc """
-      Decorate function adds the ability to a model for load the decorate fields
-      to it self.
-
-      You can load all configured fields, load just one with an atom or some
-      with a list.
-
-      This functions just call the configured function to each field passing
-      the model structure it self and it store the result in the virtual field.
-      """
-      @spec decorate(nil) :: nil
-      def decorate(nil), do: nil
-
-      @spec decorate(struct) :: struct
-      def decorate(element) do
-        @decorations |> Enum.reduce(element, &do_decorate/2)
-      end
-
-      @spec decorate(nil, any) :: nil
-      def decorate(nil, _), do: nil
-
-      @spec decorate(struct, except: atom) :: struct
-      def decorate(element, except: name) when is_atom(name),
-        do: decorate(element, except: [name])
-
-      @spec decorate(struct, atom) :: struct
-      def decorate(element, name) when is_atom(name), do: decorate(element, [name])
-
-      @spec decorate(struct, except: list(atom)) :: struct
-      def decorate(element, except: exceptions) when is_list(exceptions) do
-        names = @decorations |> Enum.map(fn {name, _decoration} -> name end)
-        decorate(element, names -- exceptions)
-      end
-
-      @spec decorate(struct, list) :: struct
-      def decorate(element, names) when is_list(names) do
-        names
-        |> Stream.map(&process_decoration/1)
-        |> Enum.reduce(element, &do_decorate/2)
-      end
-
-      @spec process_decoration(atom) :: tuple
-      defp process_decoration(field) when is_atom(field) do
-        {field, __decoration__(field)}
-      end
-
-      @spec process_decoration(tuple) :: tuple
-      defp process_decoration({field, options}) do
-        {field, Map.put(__decoration__(field), :options, options)}
-      end
-
-      @spec do_decorate(tuple, struct) :: struct
-      defp do_decorate({name, %{function: function, options: options}}, element) do
-        do_decorate(element, name, function, options)
-      end
-
-      @spec do_decorate(tuple, struct) :: struct
-      defp do_decorate({name, %{function: function}}, element) do
-        do_decorate(element, name, function)
-      end
-
-      @spec do_decorate(struct, atom, (... -> any), any) :: struct
-      defp do_decorate(element, name, function, options) do
-        %{element | name => function.(element, options)}
-      end
-
-      @spec do_decorate(struct, atom, (... -> any)) :: struct
-      defp do_decorate(element, name, function) do
-        %{element | name => function.(element)}
-      end
-    end
+  @spec decorate(struct, except: list(atom)) :: struct
+  def decorate(%module{} = element, except: exceptions) when is_list(exceptions) do
+    names = module.__decorations__ |> Enum.map(fn {name, _decoration} -> name end)
+    decorate(element, names -- exceptions)
   end
 
-  @doc false
-  def __decorations__(decorations) do
-    decorations_quoted =
-      Enum.map(decorations, fn {name, decoration} ->
-        quote do
-          def __decoration__(unquote(name)), do: unquote(Macro.escape(decoration))
-        end
-      end)
-
-    quote do
-      unquote(decorations_quoted)
-      def __decoration__(_), do: nil
-    end
+  @spec decorate(struct, list) :: struct
+  def decorate(%module{} = element, names) when is_list(names) do
+    names
+    |> Stream.map(&process_decoration(module, &1))
+    |> Enum.reduce(element, &do_decorate/2)
   end
 
-  @doc false
-  defmacro decorate_field(name, type, function, options \\ nil) do
-    quote do
-      Decoratex.__decorate_field__(
-        __MODULE__,
-        unquote(name),
-        unquote(type),
-        unquote(function),
-        unquote(options)
-      )
-    end
+  @spec process_decoration(atom, atom) :: tuple
+  defp process_decoration(module, field) when is_atom(field) do
+    {field, module.__decoration__(field)}
   end
 
-  @doc false
-  def __decorate_field__(module, name, type, function, options) do
-    decoration =
-      case :erlang.fun_info(function)[:arity] do
-        1 -> %{type: type, function: function}
-        2 -> %{type: type, function: function, options: options}
-        _ -> raise "Fields can only be decorated with functions of arity 1 or 2"
-      end
-
-    Module.put_attribute(module, :decorations, {name, decoration})
+  @spec process_decoration(atom, tuple) :: tuple
+  defp process_decoration(module, {field, options}) do
+    {field, Map.put(module.__decoration__(field), :options, options)}
   end
 
-  @doc false
-  defmacro add_decorations do
-    quote do
-      Enum.each(@decorations, fn {name, %{type: type}} ->
-        field(name, type, virtual: true)
-      end)
-    end
+  @spec do_decorate(tuple, struct) :: struct
+  defp do_decorate({name, %{function: function, options: options}}, element) do
+    do_decorate(element, name, function, options)
+  end
+
+  @spec do_decorate(tuple, struct) :: struct
+  defp do_decorate({name, %{function: function}}, element) do
+    do_decorate(element, name, function)
+  end
+
+  @spec do_decorate(struct, atom, (... -> any), any) :: struct
+  defp do_decorate(element, name, function, options) do
+    %{element | name => function.(element, options)}
+  end
+
+  @spec do_decorate(struct, atom, (... -> any)) :: struct
+  defp do_decorate(element, name, function) do
+    %{element | name => function.(element)}
   end
 end

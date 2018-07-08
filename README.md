@@ -25,26 +25,26 @@ The package can be installed as simply as adding `decoratex` to your list of dep
 
 ```elixir
   def deps do
-    [{:decoratex, "~> 1.0.0"}]
+    [{:decoratex, "~> 1.1.0"}]
   end
 ```
 
 ## Usage
 
-1. Add `use Decoratex` to your models.
+1. Add `use Decoratex.Schema` to your models.
 2. Set the decorate fields inside a block of `decorations` function.
 3. Declare each field with `decorate_field name, type, function, options`.
     * Name of the virtual field.
     * Type of the virtual field.
     * Function to calculate the value of the virtual field. Always receives a struct model as first param.
     * Default options for the function (arity 2) in case you need to use diferent options in each decoration.
-4. Add `add_decorations` inside schema definition.
-5. Use `decorate` function of your model module.
+4. Add `decorations()` inside schema definition.
+5. Use `Decoratex.decorate` function with your model.
 
 ```elixir
 defmodule Post do
   use Ecto.Schema
-  use Decoratex
+  use Decoratex.Schema
 
   decorations do
     decorate_field :happy_comments_count, :integer, &PostHelper.count_happy_comments/1
@@ -59,12 +59,13 @@ defmodule Post do
     field :title, :string
     field :body, :string
 
-    add_decorations
+    timestamps()
+    decorations()
   end
 end
 ```
 
-The decorations definition needs to be placed before schema definition, and then, you should add `add_decorations` inside the schema block. This will automatically add the virtual fields to your model.
+The decorations definition needs to be placed before schema definition, and then, you should add `decorations()` inside the schema block. This will automatically add the virtual fields to your model.
 
 Finally, you can use the `decorate` function of your model module to populate the fields that you need with the function associated to them.
 
@@ -74,19 +75,19 @@ post = Post
 |> Repo.preload(:comments))
 
 # Decorate all fields
-|> Post.decorate
+|> Decoratex.decorate
 
 # Decorate one field with an atom
-|> Post.decorate(:happy_comments_count)
+|> Decoratex.decorate(:happy_comments_count)
 
 # Decorate some fields with a list
-|> Post.decorate([:happy_comments_count, ...])
+|> Decoratex.decorate([:happy_comments_count, ...])
 
 # Decorate all fields except one with except key and an atom
-|> Post.decorate(except: :happy_comments_count)
+|> Decoratex.decorate(except: :happy_comments_count)
 
 # Decorate all fields except some with except key and a list
-|> Post.decorate(except: [:happy_comments_count, ...])
+|> Decoratex.decorate(except: [:happy_comments_count, ...])
 
 post.happy_comments_count
 234
@@ -103,7 +104,7 @@ decorate_field :mention_comments_count, :integer, &PostHelper.count_mention_comm
 Then, you can pass the options value when the struct is decorated
 
 ```
-|> Post.decorate(count_mention_comments: user.nickname)
+|> Decoratex.decorate(count_mention_comments: user.nickname)
 ```
 
 You can use a keyword list for a complex logic, but you need to care about how to manage options in the decoration function (always with arity/2), and the default options in the configurtion.
@@ -113,12 +114,11 @@ decorate_field :censured_comments, {:array, Comment}, &PostHelper.censured_comme
 ```
 
 ```
-|> Post.decorate(censured_comments: [pattern: list_of_words, replace: "*"])
+|> Decoratex.decorate(censured_comments: [pattern: list_of_words, replace: "*"])
 ```
 
 And you can mix simple and decorations with options with a list:
 
 ```
-|> Post.decorate([:happy_comments_count, censured_comments: [pattern: list_of_words, replace: "*"]])
+|> Decoratex.decorate([:happy_comments_count, censured_comments: [pattern: list_of_words, replace: "*"]])
 ```
-
